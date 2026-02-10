@@ -1,0 +1,57 @@
+## Auditd Rules for OpenClaw Monitoring
+## Place in: /etc/audit/rules.d/agent-security.rules
+## Reload: auditctl -R /etc/audit/rules.d/agent-security.rules
+
+# Delete all existing rules (clean slate)
+-D
+
+# Set buffer size
+-b 8192
+
+# Set failure mode (0=silent, 1=printk, 2=panic)
+-f 1
+
+# Monitor OpenClaw home directory
+-w /root/.openclaw/ -p rwxa -k agent_home
+
+# Monitor SSH keys (critical security)
+-w /root/.ssh/ -p rwxa -k agent_ssh_keys
+
+# Monitor SSH configuration
+-w /etc/ssh/sshd_config -p wa -k agent_ssh_config
+-w /etc/ssh/sshd_config.d/ -p wa -k agent_ssh_config
+
+# Monitor security repository
+-w /root/.openclaw/security-local/ -p rwxa -k agent_security_repo
+
+# Monitor credential files (if they exist)
+# Add your specific .env files here:
+# -w /root/.openclaw/.env -p rwxa -k agent_credentials
+# -w /path/to/your/project/.env -p rwxa -k project_credentials
+
+# Monitor for privilege escalation
+-a always,exit -F arch=b64 -S setuid -S setgid -k agent_privesc
+-a always,exit -F arch=b64 -S setreuid -S setregid -k agent_privesc
+
+# Monitor audit tampering (self-protection)
+-w /etc/audit/ -p wa -k agent_audit_tamper
+-w /var/log/audit/ -p wa -k agent_audit_tamper
+-w /sbin/auditctl -p x -k agent_audit_tamper
+-w /sbin/auditd -p x -k agent_audit_tamper
+
+# Monitor firewall changes
+-w /usr/sbin/ufw -p x -k agent_firewall
+-w /etc/ufw/ -p wa -k agent_firewall
+
+# Monitor user/group changes
+-w /etc/passwd -p wa -k agent_users
+-w /etc/group -p wa -k agent_users
+-w /etc/shadow -p wa -k agent_users
+
+# Monitor sudoers
+-w /etc/sudoers -p wa -k agent_sudo
+-w /etc/sudoers.d/ -p wa -k agent_sudo
+
+# Make rules immutable (requires reboot to change)
+# Uncomment after testing:
+# -e 2

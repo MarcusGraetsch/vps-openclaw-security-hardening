@@ -1,0 +1,306 @@
+# VPS Security Hardening for OpenClaw
+
+A production-ready security hardening solution for VPS running OpenClaw AI agents. This skill provides defense-in-depth protection following BSI IT-Grundschutz and NIST guidelines.
+
+## Overview
+
+This skill hardens your VPS in four layers:
+
+1. **Network Security** — Firewall, SSH hardening, port obscurity
+2. **System Security** — Auto-updates, intrusion detection, audit logging
+3. **Secrets Management** — Centralized credentials, secure permissions
+4. **Monitoring & Alerting** — Real-time alerts, daily briefings, risk scoring
+
+## Installation
+
+```bash
+# Clone the skill
+cd ~/.openclaw/skills
+git clone https://github.com/openclaw/skills.git temp
+cp -r temp/vps-openclaw-security-hardening/vps-openclaw-security-hardening ./
+rm -rf temp
+
+# Run installer
+cd vps-openclaw-security-hardening
+sudo ./scripts/install.sh
+```
+
+**⚠️ IMPORTANT:** Keep your current SSH session open until you've tested the new port!
+
+## Quick Start
+
+### Test SSH on New Port
+
+```bash
+# In a NEW terminal window:
+ssh -p 6262 root@your-vps-ip
+```
+
+If successful, you're done. If not, the installer shows rollback instructions.
+
+### Configure Telegram Alerts (Optional)
+
+```bash
+cp config/alerting.env.example config/alerting.env
+nano config/alerting.env
+
+# Fill in:
+# TELEGRAM_BOT_TOKEN=your_bot_token
+# TELEGRAM_CHAT_ID=your_chat_id
+```
+
+Get bot token from [@BotFather](https://t.me/BotFather).
+Get chat ID from [@userinfobot](https://t.me/userinfobot).
+
+## What Gets Installed
+
+| Component | Purpose | Resource Usage |
+|-----------|---------|----------------|
+| UFW | Firewall | ~1 MB RAM |
+| Auditd | System monitoring | ~2 MB RAM, 40 MB disk max |
+| Unattended-upgrades | Auto-updates | ~20 MB RAM (periodic) |
+| Custom scripts | Alerting & reporting | ~5 MB RAM |
+
+**Total overhead: <30 MB RAM, <50 MB disk**
+
+## Security Changes
+
+### SSH Hardening
+
+| Setting | Before | After |
+|---------|--------|-------|
+| Port | 22 | 6262 |
+| Authentication | Password + Key | Key only |
+| Root login | Yes | No |
+| Max retries | Unlimited | 3 |
+| Idle timeout | None | 10 min |
+
+### Firewall (UFW)
+
+```
+Default: DENY incoming
+Default: ALLOW outgoing
+ALLOW: 6262/tcp (SSH)
+```
+
+### Audit Logging
+
+Monitored:
+- Credential files (.env)
+- SSH keys and config
+- Privilege escalation attempts
+- Security repository changes
+- User/group modifications
+
+Log rotation: 8 MB × 5 files = 40 MB maximum
+
+## Daily Operations
+
+### View Security Events
+
+```bash
+# Today's credential access
+ausearch -ts today -k agent_credentials -i
+
+# SSH changes this week
+ausearch -ts this-week -k agent_ssh_config -i
+
+# Failed privilege escalation
+ausearch -k agent_privesc -i | grep "res=failed"
+
+# All security events
+ausearch -k agent_ -i
+```
+
+### Check System Status
+
+```bash
+./scripts/verify.sh
+```
+
+### Manual Daily Briefing
+
+```bash
+./scripts/daily-briefing.sh
+```
+
+## Alerting
+
+### Critical Alerts (Immediate Telegram)
+
+Triggers:
+- Credential file accessed
+- SSH config modified
+- Firewall disabled
+- Audit daemon stopped
+- Privilege escalation detected
+
+### Daily Briefing (08:00 CET)
+
+Includes:
+- Security event summary
+- Activity metrics
+- Risk score (0-100)
+- Recommended actions
+
+### Risk Scoring
+
+| Score | Level | Meaning |
+|-------|-------|---------|
+| 0-20 | 🟢 Low | Normal activity |
+| 21-50 | 🟡 Medium | Some attention needed |
+| 51-80 | 🟠 High | Review recommended |
+| 81-100 | 🔴 Critical | Immediate action |
+
+## Troubleshooting
+
+### Can't connect via new SSH port
+
+1. **Don't close your current terminal!**
+2. Check: `ss -tulnp | grep 6262`
+3. Test: `ssh -p 6262 root@ip`
+4. If fails, rollback: `sudo ./scripts/rollback-ssh.sh`
+
+### Too many alerts
+
+Edit `config/alerting.env`:
+```bash
+ALERT_LEVEL=warning  # Only warning and above
+IGNORE_PATTERNS="vim,nano"  # Exclude editors
+```
+
+### Audit logs growing too fast
+
+Check what's being logged:
+```bash
+ausearch --start today --raw | aureport --file --summary
+```
+
+Reduce rules in `rules/audit.rules` if needed.
+
+### Verify installation
+
+```bash
+./scripts/verify.sh
+```
+
+## Uninstallation
+
+```bash
+# Rollback SSH
+./scripts/rollback-ssh.sh
+
+# Disable firewall (careful!)
+sudo ufw disable
+
+# Stop auditd
+sudo systemctl stop auditd
+sudo systemctl disable auditd
+
+# Remove cron jobs
+sudo rm /etc/cron.d/agent-security
+```
+
+## Customization
+
+### Change SSH Port
+
+```bash
+# Edit rules/audit.rules to monitor new port
+# Edit scripts/install.sh (SSH_PORT variable)
+# Re-run: sudo ./scripts/install.sh
+```
+
+### Add Custom Audit Rules
+
+Edit `rules/audit.rules`:
+```bash
+# Monitor custom directory
+-w /path/to/sensitive/dir -p rwxa -k my_custom_rule
+```
+
+Reload:
+```bash
+sudo auditctl -R rules/audit.rules
+```
+
+### Adjust Risk Scores
+
+Edit `scripts/daily-briefing.sh`:
+```bash
+declare -A RISK_WEIGHTS=(
+    ["credential_access"]=100
+    ["your_event"]=50
+)
+```
+
+## Architecture
+
+```
+┌─────────────────────────────────────────┐
+│              User Layer                 │
+│         (Telegram, SSH, CLI)            │
+└─────────────────────────────────────────┘
+                    │
+┌─────────────────────────────────────────┐
+│           OpenClaw Agent                │
+│         (OpenClaw Agent)           │
+└─────────────────────────────────────────┘
+                    │
+┌─────────────────────────────────────────┐
+│           Audit/Monitor Layer           │
+│  ┌─────────┐ ┌─────────┐ ┌──────────┐ │
+│  │ auditd  │ │  UFW    │ │ cronjobs │ │
+│  └─────────┘ └─────────┘ └──────────┘ │
+└─────────────────────────────────────────┘
+                    │
+┌─────────────────────────────────────────┐
+│           System Layer                  │
+│  ┌─────────┐ ┌─────────┐ ┌──────────┐ │
+│  │   SSH   │ │ Kernel  │ │ Files    │ │
+│  └─────────┘ └─────────┘ └──────────┘ │
+└─────────────────────────────────────────┘
+```
+
+## Security Framework Alignment
+
+### BSI IT-Grundschutz
+
+- ORP.4.A12 — Logging
+- APP.3.3 — SSH
+- OPS.1.1.5 — Patch Management
+- DER.1.1 — Incident Response
+
+### NIST Cybersecurity Framework
+
+- Identify — Asset inventory
+- Protect — SSH/UFW hardening
+- Detect — Auditd monitoring
+- Respond — Alerting system
+- Recover — Backup/rollback
+
+## Contributing
+
+Contributions welcome! Areas for improvement:
+
+- Additional audit rules
+- More alerting channels (Slack, Discord)
+- Web dashboard
+- Machine learning anomaly detection
+- Ansible/Puppet/Chef modules
+
+## License
+
+MIT License — See LICENSE file
+
+**Disclaimer:** This is a security tool. Always test in non-production environments first. The authors are not responsible for any damage or data loss.
+
+## Support
+
+- **Issues**: https://github.com/openclaw/skills/issues
+- **Discussions**: https://discord.com/invite/clawd
+- **Documentation**: This README and docs/ directory
+
+---
+
+**Remember**: Security is a journey, not a destination. Review and update regularly.
