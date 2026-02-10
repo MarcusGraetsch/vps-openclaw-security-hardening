@@ -10,7 +10,7 @@ A production-ready security hardening solution for VPS running OpenClaw AI agent
 - Use a **dedicated machine** specifically for OpenClaw
 - Separate from your personal/work machines
 - **Acceptable:**
-  - Cloud VPS (Hetzner, DigitalOcean, AWS, Contabo, etc.)
+  - Cloud VPS (any provider)
   - Dedicated bare-metal servers (on-premise or colocation)
   - On-premise servers (as long as dedicated to OpenClaw)
 - **NOT recommended:**
