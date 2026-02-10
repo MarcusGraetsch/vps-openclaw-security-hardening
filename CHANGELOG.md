@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2026-02-10
+
+### Changed
+- Clarified machine requirements: VPS, bare-metal, or on-premise servers are all acceptable
+- As long as the machine is dedicated to OpenClaw and doesn't contain sensitive data
+
 ## [1.0.3] - 2026-02-10
 
 ### Added
@@ -53,6 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Follows NIST Cybersecurity Framework
 - Defense-in-depth architecture
 
+[1.0.4]: https://github.com/MarcusGraetsch/vps-openclaw-security-hardening/releases/tag/v1.0.4
 [1.0.3]: https://github.com/MarcusGraetsch/vps-openclaw-security-hardening/releases/tag/v1.0.3
 [1.0.2]: https://github.com/MarcusGraetsch/vps-openclaw-security-hardening/releases/tag/v1.0.2
 [1.0.1]: https://github.com/MarcusGraetsch/vps-openclaw-security-hardening/releases/tag/v1.0.1
