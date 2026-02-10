@@ -1,7 +1,7 @@
 ---
 name: vps-openclaw-security-hardening
 description: Production-ready security hardening for VPS running OpenClaw AI agents. Includes SSH hardening (custom port), firewall, audit logging, credential management, and intelligent alerting. Follows BSI IT-Grundschutz and NIST guidelines with minimal resource overhead.
-version: 1.0.4
+version: 1.0.5
 author: OpenClaw Community
 homepage: https://github.com/MarcusGraetsch/vps-openclaw-security-hardening
 metadata:
