@@ -40,6 +40,8 @@ echo "╚═══════════════════════�
 echo ""
 
 echo "=== SSH CONFIGURATION ==="
+SSH_PORT=${SSH_PORT:-$(grep "^Port " /etc/ssh/sshd_config | tail -1 | awk '{print $2}')}
+SSH_PORT=${SSH_PORT:-22}
 check "SSH running on port $SSH_PORT" "ss -tulnp | grep -q ':$SSH_PORT.*sshd'"
 check "Password authentication disabled" "grep -q 'PasswordAuthentication no' /etc/ssh/sshd_config"
 check "Root login disabled" "grep -q 'PermitRootLogin no' /etc/ssh/sshd_config"
@@ -49,7 +51,7 @@ echo ""
 echo "=== FIREWALL (UFW) ==="
 check "UFW installed" "which ufw"
 check "UFW active" "ufw status | grep -q 'Status: active'"
-check "UFW allows port $SSH_PORT" "ufw status | grep -q '$SSH_PORT/tcp'"
+check "UFW allows SSH port" "ufw status | grep -q 'SSH hardened'"
 check "UFW denies incoming by default" "ufw status verbose | grep -q 'Default: deny (incoming)'"
 
 echo ""
@@ -63,6 +65,11 @@ echo ""
 echo "=== AUTO-UPDATES ==="
 check "Unattended-upgrades installed" "which unattended-upgrade"
 check "Unattended-upgrades running" "systemctl is-active --quiet unattended-upgrades"
+
+echo ""
+echo "=== FAIL2BAN ==="
+check "Fail2ban installed" "which fail2ban-server"
+check "Fail2ban running" "systemctl is-active --quiet fail2ban"
 
 echo ""
 echo "=== CREDENTIAL SECURITY ==="

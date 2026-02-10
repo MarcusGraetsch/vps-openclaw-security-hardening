@@ -2,6 +2,38 @@
 
 A production-ready security hardening solution for VPS running OpenClaw AI agents. This skill provides defense-in-depth protection following BSI IT-Grundschutz and NIST guidelines.
 
+## ⚠️ CRITICAL SECURITY WARNINGS
+
+### 1. Dedicated VPS Only
+**DO NOT run OpenClaw on a server/machine that contains sensitive personal data, financial information, or production workloads.**
+
+- Use a **dedicated VPS** specifically for OpenClaw
+- Separate from your personal/work machines
+- Acceptable: Cloud VPS (Hetzner, DigitalOcean, AWS, etc.), dedicated server
+- **NOT recommended**: Your personal laptop, work machine, home server with family photos
+
+### 2. Operating System Support
+
+| OS | Status | Notes |
+|----|--------|-------|
+| **Ubuntu 20.04+** | ✅ Fully supported | Primary target |
+| **Debian 11+** | ✅ Supported | Tested |
+| **Other Linux** | ⚠️ May work | Not tested |
+| **macOS** | ❌ Not supported | Use Linux VM instead |
+| **Windows** | ❌ Not supported | Use WSL2 + Ubuntu |
+
+### 3. What This Tool Does NOT Protect Against
+
+- Zero-day exploits in OpenClaw itself
+- Compromised AI model providers
+- Social engineering attacks
+- Physical server access
+- Network-level attacks (DDoS)
+
+**This is a defense-in-depth tool, not a guarantee of security.**
+
+---
+
 ## ⚠️ IMPORTANT: Choose Your SSH Port
 
 **Before running the installer**, you must choose a custom SSH port (1024-65535). This is an intentional security decision you should make consciously.
@@ -104,6 +136,7 @@ nano config/alerting.env
 | Root login | Yes | No |
 | Max retries | Unlimited | 3 |
 | Idle timeout | None | 10 min |
+| Fail2ban | Not installed | Active (brute-force protection) |
 
 ### Firewall (UFW)
 
@@ -112,6 +145,15 @@ Default: DENY incoming
 Default: ALLOW outgoing
 ALLOW: ${SSH_PORT}/tcp (SSH - your chosen port)
 ```
+
+### Services Hardened
+
+| Service | Action | Reason |
+|---------|--------|--------|
+| **CUPS (printing)** | Stopped & disabled | Not needed on VPS |
+| **SSH** | Port changed, key-only | Reduce attack surface |
+| **Fail2ban** | Installed & enabled | Brute-force protection |
+| **Auto-updates** | Enabled | Security patches |
 
 ### Audit Logging
 

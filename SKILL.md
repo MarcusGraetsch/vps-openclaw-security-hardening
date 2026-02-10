@@ -1,23 +1,30 @@
 ---
 name: vps-openclaw-security-hardening
 description: Production-ready security hardening for VPS running OpenClaw AI agents. Includes SSH hardening (custom port), firewall, audit logging, credential management, and intelligent alerting. Follows BSI IT-Grundschutz and NIST guidelines with minimal resource overhead.
-version: 1.0.0
+version: 1.0.3
 author: OpenClaw Community
 homepage: https://github.com/MarcusGraetsch/vps-openclaw-security-hardening
 metadata:
   openclaw:
     emoji: 🛡️
     requires:
-      bins: ["ssh", "ufw", "auditd", "systemctl", "apt-get"]
-      os: ["linux"]
-    tags: ["security", "hardening", "vps", "audit", "monitoring", "firewall", "ssh"]
+      bins: ["ssh", "ufw", "auditd", "systemctl", "apt-get", "fail2ban"]
+      os: ["ubuntu", "debian"]
+    tags: ["security", "hardening", "vps", "audit", "monitoring", "firewall", "ssh", "fail2ban"]
     install: "SSH_PORT=4848 ./scripts/install.sh"
     verify: "./scripts/verify.sh"
+    warning: "DO NOT use on machines with sensitive personal data. Use dedicated VPS only."
 ---
 
 # VPS Security Hardening for OpenClaw
 
 Production-ready security hardening for AI agent deployments on VPS.
+
+## ⚠️ CRITICAL WARNINGS
+
+**DO NOT run OpenClaw on servers with sensitive personal data.** Use a dedicated VPS.
+
+**Supported OS:** Ubuntu 20.04+, Debian 11+. Not for Windows (use WSL) or macOS.
 
 ## ⚠️ Choose Your SSH Port First
 
@@ -49,10 +56,11 @@ ssh -p ${SSH_PORT} root@your-vps-ip
 
 ## Requirements
 
-- Ubuntu 20.04+ or Debian 11+
+- **OS:** Ubuntu 20.04+ or Debian 11+ (Linux only)
+- **NOT supported:** Windows (use WSL2), macOS
 - Root access
 - Existing SSH key authentication
-- Telegram bot (optional, for alerts)
+- Alert channel (optional): Telegram, Discord, Slack, Email, or Webhook
 - **Custom SSH port of your choice (1024-65535)**
 
 ## Security Changes
@@ -62,10 +70,16 @@ ssh -p ${SSH_PORT} root@your-vps-ip
 - Auth: Keys only (no passwords)
 - Root login: Disabled
 - Max retries: 3
+- Fail2ban: Brute-force protection
 
 ### Firewall
 - Default: Deny incoming
 - Allow: Your chosen SSH port only
+
+### Services
+- CUPS (printing): Stopped & disabled
+- Fail2ban: Intrusion detection enabled
+- Auto-updates: Security patches automatic
 
 ### Monitoring
 - Credential file access tracking

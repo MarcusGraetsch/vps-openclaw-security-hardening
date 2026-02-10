@@ -68,7 +68,7 @@ install_packages() {
     export DEBIAN_FRONTEND=noninteractive
     apt-get update -qq
     
-    PACKAGES="ufw auditd audispd-plugins unattended-upgrades"
+    PACKAGES="ufw auditd audispd-plugins unattended-upgrades fail2ban"
     
     for pkg in $PACKAGES; do
         if dpkg -l | grep -q "^ii  $pkg "; then
@@ -78,6 +78,10 @@ install_packages() {
             apt-get install -y -qq "$pkg" || warn "Failed to install $pkg"
         fi
     done
+    
+    # Enable fail2ban for SSH protection
+    systemctl enable fail2ban 2>/dev/null || warn "Could not enable fail2ban"
+    systemctl start fail2ban 2>/dev/null || warn "Could not start fail2ban"
 }
 
 configure_ssh() {
@@ -149,6 +153,22 @@ configure_auditd() {
         warn "Some audit rules already exist, continuing..."
     
     log "  Auditd configured with 8MB × 5 logs max"
+}
+
+disable_unnecessary_services() {
+    log "Disabling unnecessary services..."
+    
+    # CUPS (printing) - not needed on VPS
+    if systemctl is-active --quiet cups 2>/dev/null; then
+        systemctl stop cups 2>/dev/null || true
+        systemctl disable cups 2>/dev/null || true
+        log "  CUPS (printing) stopped and disabled"
+    fi
+    
+    # Other potentially unnecessary services
+    # (users can customize this section)
+    
+    log "  Unnecessary services disabled"
 }
 
 configure_autoupdates() {
@@ -253,6 +273,7 @@ main() {
     check_os
     backup_configs
     install_packages
+    disable_unnecessary_services
     configure_ssh
     configure_ufw
     configure_auditd
