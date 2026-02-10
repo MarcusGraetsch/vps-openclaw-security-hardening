@@ -63,7 +63,9 @@ ssh -p ${SSH_PORT} root@your-vps-ip
 
 If successful, you're done. If not, the installer shows rollback instructions.
 
-### Configure Telegram Alerts (Optional)
+### Configure Alerts (Optional)
+
+Choose your preferred notification channel. The skill supports: **Telegram, Discord, Slack, Email, Webhook**
 
 ```bash
 cp config/alerting.env.example config/alerting.env
@@ -74,8 +76,11 @@ nano config/alerting.env
 # TELEGRAM_CHAT_ID=your_chat_id
 ```
 
-Get bot token from [@BotFather](https://t.me/BotFather).
-Get chat ID from [@userinfobot](https://t.me/userinfobot).
+# Telegram: Get bot token from @BotFather, chat ID from @userinfobot
+# Discord: Create webhook in server settings
+# Slack: Create incoming webhook
+# Email: Ensure mail/sendmail is configured
+# Webhook: Any HTTP endpoint that accepts POST
 
 ## What Gets Installed
 
@@ -151,7 +156,7 @@ ausearch -k agent_ -i
 
 ## Alerting
 
-### Critical Alerts (Immediate Telegram)
+### Critical Alerts (Immediate Notification)
 
 Triggers:
 - Credential file accessed
@@ -264,7 +269,8 @@ declare -A RISK_WEIGHTS=(
 ```
 ┌─────────────────────────────────────────┐
 │              User Layer                 │
-│         (Telegram, SSH, CLI)            │
+│    (Multi-channel: Telegram, Discord,   │
+│     Slack, Email, Webhook, CLI)         │
 └─────────────────────────────────────────┘
                     │
 ┌─────────────────────────────────────────┐

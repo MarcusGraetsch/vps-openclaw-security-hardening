@@ -45,7 +45,7 @@ ssh -p ${SSH_PORT} root@your-vps-ip
 | **Network** | Firewall, SSH hardening | UFW, custom port (your choice), key-only |
 | **System** | Auto-updates, monitoring | unattended-upgrades, auditd |
 | **Secrets** | Credential management | Centralized .env, 600 permissions |
-| **Monitoring** | Audit logging, alerting | Kernel-level audit, Telegram |
+| **Monitoring** | Audit logging, alerting | Kernel-level audit, multi-channel alerts |
 
 ## Requirements
 
