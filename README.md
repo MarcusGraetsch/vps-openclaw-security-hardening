@@ -4,13 +4,21 @@ A production-ready security hardening solution for VPS running OpenClaw AI agent
 
 ## ⚠️ CRITICAL SECURITY WARNINGS
 
-### 1. Dedicated VPS Only
+### 1. Dedicated Machine Only
 **DO NOT run OpenClaw on a server/machine that contains sensitive personal data, financial information, or production workloads.**
 
-- Use a **dedicated VPS** specifically for OpenClaw
+- Use a **dedicated machine** specifically for OpenClaw
 - Separate from your personal/work machines
-- Acceptable: Cloud VPS (Hetzner, DigitalOcean, AWS, etc.), dedicated server
-- **NOT recommended**: Your personal laptop, work machine, home server with family photos
+- **Acceptable:**
+  - Cloud VPS (Hetzner, DigitalOcean, AWS, Contabo, etc.)
+  - Dedicated bare-metal servers (on-premise or colocation)
+  - On-premise servers (as long as dedicated to OpenClaw)
+- **NOT recommended:**
+  - Your personal laptop or desktop
+  - Work machine with company data
+  - Home server with family photos/documents
+  - Shared server with other applications
+  - Any machine containing sensitive personal or financial data
 
 ### 2. Operating System Support
 

@@ -22,9 +22,9 @@ Production-ready security hardening for AI agent deployments on VPS.
 
 ## ⚠️ CRITICAL WARNINGS
 
-**DO NOT run OpenClaw on servers with sensitive personal data.** Use a dedicated VPS.
+**DO NOT run OpenClaw on servers/machines with sensitive personal data.** Use a dedicated machine (VPS, bare-metal, or on-premise server dedicated to OpenClaw).
 
-**Supported OS:** Ubuntu 20.04+, Debian 11+. Not for Windows (use WSL) or macOS.
+**Supported OS:** Ubuntu 20.04+, Debian 11+. Not for Windows (use WSL2) or macOS.
 
 ## ⚠️ Choose Your SSH Port First
 
