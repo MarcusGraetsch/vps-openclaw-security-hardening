@@ -67,7 +67,10 @@ systemctl restart sshd
 
 echo "Updating firewall..."
 ufw allow 22/tcp comment 'SSH emergency rollback'
-ufw delete allow 6262/tcp 2>/dev/null || true
+# Delete any custom SSH ports (pattern match)
+for port in $(ufw status | grep -oE '^[0-9]+/tcp' | grep -v '22/tcp' | cut -d'/' -f1); do
+    ufw delete allow ${port}/tcp 2>/dev/null || true
+done
 
 echo ""
 echo -e "${GREEN}╔════════════════════════════════════════════════╗${NC}"

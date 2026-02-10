@@ -2,6 +2,30 @@
 
 A production-ready security hardening solution for VPS running OpenClaw AI agents. This skill provides defense-in-depth protection following BSI IT-Grundschutz and NIST guidelines.
 
+## ⚠️ IMPORTANT: Choose Your SSH Port
+
+**Before running the installer**, you must choose a custom SSH port (1024-65535). This is an intentional security decision you should make consciously.
+
+```bash
+# Example: Choose port 4848
+export SSH_PORT=4848
+sudo ./scripts/install.sh
+```
+
+**Why this matters:**
+- Using the default port 22 makes you an easy target for automated attacks
+- A custom port adds "security through obscurity" (not a substitute for good security, but raises the bar)
+- You should choose a port that works with your network environment
+
+**Test your chosen port first:**
+```bash
+# Make sure the port is available
+ss -tulnp | grep ":${SSH_PORT} "
+# Should return nothing (port not in use)
+```
+
+---
+
 ## Overview
 
 This skill hardens your VPS in four layers:
@@ -33,7 +57,8 @@ sudo ./scripts/install.sh
 
 ```bash
 # In a NEW terminal window:
-ssh -p 6262 root@your-vps-ip
+ssh -p ${SSH_PORT} root@your-vps-ip
+# (Replace ${SSH_PORT} with your chosen port, e.g., 4848)
 ```
 
 If successful, you're done. If not, the installer shows rollback instructions.
@@ -69,7 +94,7 @@ Get chat ID from [@userinfobot](https://t.me/userinfobot).
 
 | Setting | Before | After |
 |---------|--------|-------|
-| Port | 22 | 6262 |
+| Port | 22 | ${SSH_PORT} (your choice, 1024-65535) |
 | Authentication | Password + Key | Key only |
 | Root login | Yes | No |
 | Max retries | Unlimited | 3 |
@@ -80,7 +105,7 @@ Get chat ID from [@userinfobot](https://t.me/userinfobot).
 ```
 Default: DENY incoming
 Default: ALLOW outgoing
-ALLOW: 6262/tcp (SSH)
+ALLOW: ${SSH_PORT}/tcp (SSH - your chosen port)
 ```
 
 ### Audit Logging
@@ -157,8 +182,8 @@ Includes:
 ### Can't connect via new SSH port
 
 1. **Don't close your current terminal!**
-2. Check: `ss -tulnp | grep 6262`
-3. Test: `ssh -p 6262 root@ip`
+2. Check: `ss -tulnp | grep "${SSH_PORT} "`
+3. Test: `ssh -p ${SSH_PORT} root@ip`
 4. If fails, rollback: `sudo ./scripts/rollback-ssh.sh`
 
 ### Too many alerts
@@ -281,13 +306,33 @@ declare -A RISK_WEIGHTS=(
 
 ## Contributing
 
-Contributions welcome! Areas for improvement:
+Contributions welcome! Whether you're fixing a bug, adding a feature, or improving documentation, your help is appreciated.
+
+### Get in Contact
+
+- **Marcus Grätsch** (Original Author): Reach out via GitHub issues or email
+- **Issues**: https://github.com/MarcusGraetsch/vps-openclaw-security-hardening/issues
+- **Pull Requests**: https://github.com/MarcusGraetsch/vps-openclaw-security-hardening/pulls
+
+### Areas for Improvement
 
 - Additional audit rules
-- More alerting channels (Slack, Discord)
-- Web dashboard
+- More alerting channels (Slack, Discord, Email)
+- Web dashboard for monitoring
 - Machine learning anomaly detection
 - Ansible/Puppet/Chef modules
+- Support for additional operating systems
+- Integration with other monitoring tools (Prometheus, Grafana)
+
+### Development Workflow
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/my-feature`)
+3. Make your changes
+4. Test thoroughly in a safe environment
+5. Submit a pull request with clear description
+
+Please ensure your code follows the existing style and includes appropriate documentation.
 
 ## License
 

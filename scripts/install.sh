@@ -83,7 +83,7 @@ install_packages() {
 configure_ssh() {
     log "Configuring SSH..."
     
-    SSH_PORT=6262
+    SSH_PORT=${SSH_PORT:-6262}
     
     # Backup current config
     cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak.$(date +%s)
@@ -122,12 +122,12 @@ configure_ufw() {
     ufw default allow outgoing
     
     # Allow SSH on new port
-    ufw allow 6262/tcp comment 'SSH hardened'
+    ufw allow ${SSH_PORT:-6262}/tcp comment 'SSH hardened'
     
     # Enable (will prompt if run interactively)
     ufw --force enable
     
-    log "  UFW enabled, SSH on port 6262 allowed"
+    log "  UFW enabled, SSH on port ${SSH_PORT:-6262} allowed"
 }
 
 configure_auditd() {
@@ -188,8 +188,8 @@ verify_installation() {
     echo ""
     
     # SSH
-    echo -n "SSH on port 6262: "
-    if ss -tulnp | grep -q ':6262.*sshd'; then
+    echo -n "SSH on port ${SSH_PORT:-6262}: "
+    if ss -tulnp | grep -q ':${SSH_PORT:-6262}.*sshd'; then
         echo -e "${GREEN}✓ OK${NC}"
     else
         echo -e "${RED}✗ FAILED${NC}"
@@ -230,7 +230,7 @@ show_summary() {
     echo "╚════════════════════════════════════════════════╝"
     echo ""
     echo "Next steps:"
-    echo "  1. 🧪 TEST SSH: ssh -p 6262 root@<your-ip>"
+    echo "  1. 🧪 TEST SSH: ssh -p ${SSH_PORT:-6262} root@<your-ip>"
     echo "  2. 📋 Review:   $SKILL_DIR/docs/SECURITY.md"
     echo "  3. 🚨 Alerts:   Edit $SKILL_DIR/config/alerting.env"
     echo ""

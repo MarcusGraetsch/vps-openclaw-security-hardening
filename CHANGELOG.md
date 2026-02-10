@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Initial release of VPS Security Hardening skill
-- SSH hardening: custom port (6262), key-only auth, root disabled
+- SSH hardening: custom port (user-defined, 1024-65535), key-only auth, root disabled
 - UFW firewall: default deny, SSH port only
 - Auditd logging: credential monitoring, SSH config tracking
 - Automatic updates via unattended-upgrades

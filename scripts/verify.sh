@@ -40,7 +40,7 @@ echo "╚═══════════════════════�
 echo ""
 
 echo "=== SSH CONFIGURATION ==="
-check "SSH running on port 6262" "ss -tulnp | grep -q ':6262.*sshd'"
+check "SSH running on port $SSH_PORT" "ss -tulnp | grep -q ':$SSH_PORT.*sshd'"
 check "Password authentication disabled" "grep -q 'PasswordAuthentication no' /etc/ssh/sshd_config"
 check "Root login disabled" "grep -q 'PermitRootLogin no' /etc/ssh/sshd_config"
 check "Max auth tries configured" "grep -q 'MaxAuthTries' /etc/ssh/sshd_config"
@@ -49,7 +49,7 @@ echo ""
 echo "=== FIREWALL (UFW) ==="
 check "UFW installed" "which ufw"
 check "UFW active" "ufw status | grep -q 'Status: active'"
-check "UFW allows port 6262" "ufw status | grep -q '6262/tcp'"
+check "UFW allows port $SSH_PORT" "ufw status | grep -q '$SSH_PORT/tcp'"
 check "UFW denies incoming by default" "ufw status verbose | grep -q 'Default: deny (incoming)'"
 
 echo ""
