@@ -8,12 +8,13 @@ metadata:
   openclaw:
     emoji: 🛡️
     requires:
-      bins: ["ssh", "ufw", "auditd", "systemctl", "apt-get", "fail2ban"]
+      bins: ["ssh", "ufw", "auditd", "systemctl", "apt-get"]
+      optional: ["fail2ban"]
       os: ["ubuntu", "debian"]
     tags: ["security", "hardening", "vps", "audit", "monitoring", "firewall", "ssh", "fail2ban"]
     install: "SSH_PORT=4848 ./scripts/install.sh"
     verify: "./scripts/verify.sh"
-    warning: "DO NOT use on machines with sensitive personal data. Use dedicated VPS only."
+    warning: "DO NOT use on machines with sensitive personal data. Use dedicated VPS only. Test in VM first."
 ---
 
 # VPS Security Hardening for OpenClaw
