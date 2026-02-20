@@ -398,8 +398,6 @@ MIT License — See LICENSE file
 
 ## Support
 
-- **Issues**: https://github.com/openclaw/skills/issues
-- **Discussions**: https://discord.com/invite/clawd
 - **Documentation**: This README and docs/ directory
 
 ---
